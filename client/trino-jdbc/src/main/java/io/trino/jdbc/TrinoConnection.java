@@ -113,6 +113,7 @@ public class TrinoConnection
     private final Call.Factory httpCallFactory;
     private final Set<TrinoStatement> statements = newSetFromMap(new ConcurrentHashMap<>());
     private boolean useExplicitPrepare = true;
+    private final Optional<Long> maxRow;
 
     TrinoConnection(TrinoDriverUri uri, Call.Factory httpCallFactory)
     {
@@ -122,6 +123,7 @@ public class TrinoConnection
         uri.getSchema().ifPresent(schema::set);
         uri.getCatalog().ifPresent(catalog::set);
         this.user = uri.getUser();
+        this.maxRow = uri.getMaxRow();
         this.sessionUser.set(uri.getSessionUser());
         this.applicationNamePrefix = uri.getApplicationNamePrefix();
         this.source = uri.getSource();
@@ -703,6 +705,11 @@ public class TrinoConnection
     URI getURI()
     {
         return jdbcUri;
+    }
+
+    Optional<Long> getMaxRow()
+    {
+        return maxRow;
     }
 
     @VisibleForTesting
