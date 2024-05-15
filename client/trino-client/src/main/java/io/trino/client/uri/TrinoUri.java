@@ -87,6 +87,7 @@ import static io.trino.client.uri.ConnectionProperties.KERBEROS_PRINCIPAL;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_REMOTE_SERVICE_NAME;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_SERVICE_PRINCIPAL_PATTERN;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_USE_CANONICAL_HOSTNAME;
+import static io.trino.client.uri.ConnectionProperties.MAX_ROW;
 import static io.trino.client.uri.ConnectionProperties.PASSWORD;
 import static io.trino.client.uri.ConnectionProperties.ROLES;
 import static io.trino.client.uri.ConnectionProperties.SESSION_PROPERTIES;
@@ -169,6 +170,7 @@ public class TrinoUri
     private Optional<Map<String, String>> sessionProperties;
     private Optional<String> source;
     private Optional<Boolean> explicitPrepare;
+    private Optional<Long> maxRow;
 
     private Optional<String> catalog = Optional.empty();
     private Optional<String> schema = Optional.empty();
@@ -222,7 +224,8 @@ public class TrinoUri
             Optional<String> traceToken,
             Optional<Map<String, String>> sessionProperties,
             Optional<String> source,
-            Optional<Boolean> explicitPrepare)
+            Optional<Boolean> explicitPrepare,
+            Optional<Long> maxRow)
             throws SQLException
     {
         this.uri = requireNonNull(uri, "uri is null");
@@ -276,6 +279,7 @@ public class TrinoUri
         this.sessionProperties = SESSION_PROPERTIES.getValueOrDefault(urlProperties, sessionProperties);
         this.source = SOURCE.getValueOrDefault(urlProperties, source);
         this.explicitPrepare = EXPLICIT_PREPARE.getValueOrDefault(urlProperties, explicitPrepare);
+        this.maxRow = MAX_ROW.getValueOrDefault(urlProperties, maxRow);
 
         properties = buildProperties();
 
@@ -362,6 +366,7 @@ public class TrinoUri
         traceToken.ifPresent(value -> properties.setProperty(PropertyName.TRACE_TOKEN.toString(), value));
         source.ifPresent(value -> properties.setProperty(PropertyName.SOURCE.toString(), value));
         explicitPrepare.ifPresent(value -> properties.setProperty(PropertyName.EXPLICIT_PREPARE.toString(), value.toString()));
+        maxRow.ifPresent(value -> properties.setProperty(PropertyName.MAX_ROW.toString(), value.toString()));
         return properties;
     }
 
@@ -422,6 +427,7 @@ public class TrinoUri
         this.sessionProperties = SESSION_PROPERTIES.getValue(properties);
         this.source = SOURCE.getValue(properties);
         this.explicitPrepare = EXPLICIT_PREPARE.getValue(properties);
+        this.maxRow = MAX_ROW.getValue(properties);
 
         // enable SSL by default for the trino schema and the standard port
         useSecureConnection = ssl.orElse(uri.getScheme().equals("https") || (uri.getScheme().equals("trino") && uri.getPort() == 443));
@@ -477,6 +483,11 @@ public class TrinoUri
     public Optional<String> getUser()
     {
         return user;
+    }
+
+    public Optional<Long> getMaxRow()
+    {
+        return maxRow;
     }
 
     public boolean hasPassword()
@@ -733,7 +744,7 @@ public class TrinoUri
             }
 
             String key = parts.get(0);
-            PropertyName name = PropertyName.findByKey(key).orElseThrow(() -> new SQLException(format("Unrecognized connection property '%s'", key)));
+            PropertyName name = PropertyName.findByKey(key).orElseThrow(() -> new SQLException(format("Unrecognized connection property 43343 '%s'", key)));
             if (restrictedProperties.contains(name)) {
                 throw new RestrictedPropertyException(name, format("Connection property %s cannot be set in the URL", parts.get(0)));
             }
@@ -871,7 +882,7 @@ public class TrinoUri
     {
         for (String propertyName : connectionProperties.stringPropertyNames()) {
             if (ConnectionProperties.forKey(propertyName) == null) {
-                throw new SQLException(format("Unrecognized connection property '%s'", propertyName));
+                throw new SQLException(format("Unrecognized connection property  545454 '%s'", propertyName));
             }
         }
 
@@ -939,6 +950,7 @@ public class TrinoUri
         private Map<String, String> sessionProperties;
         private String source;
         private Boolean explicitPrepare;
+        private Long maxRow;
 
         private Builder() {}
 
@@ -1282,7 +1294,8 @@ public class TrinoUri
                     Optional.ofNullable(traceToken),
                     Optional.ofNullable(sessionProperties),
                     Optional.ofNullable(source),
-                    Optional.ofNullable(explicitPrepare));
+                    Optional.ofNullable(explicitPrepare),
+                    Optional.ofNullable(maxRow));
         }
     }
 }

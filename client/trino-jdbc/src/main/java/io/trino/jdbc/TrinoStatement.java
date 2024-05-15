@@ -57,6 +57,7 @@ public class TrinoStatement
     TrinoStatement(TrinoConnection connection, Consumer<TrinoStatement> onClose)
     {
         this.connection = new AtomicReference<>(requireNonNull(connection, "connection is null"));
+        connection.getMaxRow().ifPresent(value -> this.maxRows.set(value));
         this.onClose = requireNonNull(onClose, "onClose is null");
     }
 

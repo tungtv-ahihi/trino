@@ -140,10 +140,7 @@ public class TrinoDatabaseMetaData
     public String getDatabaseProductVersion()
             throws SQLException
     {
-        try (ResultSet rs = select("SELECT version()")) {
-            rs.next();
-            return rs.getString(1);
-        }
+        throw new SQLException("No results");
     }
 
     @Override
@@ -916,11 +913,7 @@ public class TrinoDatabaseMetaData
     {
         schemaPattern = escapeIfNecessary(schemaPattern);
         procedureNamePattern = escapeIfNecessary(procedureNamePattern);
-        return selectEmpty("" +
-                "SELECT PROCEDURE_CAT, PROCEDURE_SCHEM, PROCEDURE_NAME,\n " +
-                "  null, null, null, REMARKS, PROCEDURE_TYPE, SPECIFIC_NAME\n" +
-                "FROM system.jdbc.procedures\n" +
-                "ORDER BY PROCEDURE_CAT, PROCEDURE_SCHEM, PROCEDURE_NAME, SPECIFIC_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -930,14 +923,7 @@ public class TrinoDatabaseMetaData
         schemaPattern = escapeIfNecessary(schemaPattern);
         procedureNamePattern = escapeIfNecessary(procedureNamePattern);
         columnNamePattern = escapeIfNecessary(columnNamePattern);
-        return selectEmpty("" +
-                "SELECT PROCEDURE_CAT, PROCEDURE_SCHEM, PROCEDURE_NAME, " +
-                "  COLUMN_NAME, COLUMN_TYPE, DATA_TYPE, TYPE_NAME,\n" +
-                "  PRECISION, LENGTH, SCALE, RADIX,\n" +
-                "  NULLABLE, REMARKS, COLUMN_DEF, SQL_DATA_TYPE, SQL_DATETIME_SUB,\n" +
-                "  CHAR_OCTET_LENGTH, ORDINAL_POSITION, IS_NULLABLE, SPECIFIC_NAME\n" +
-                "FROM system.jdbc.procedure_columns\n" +
-                "ORDER BY PROCEDURE_CAT, PROCEDURE_SCHEM, PROCEDURE_NAME, SPECIFIC_NAME, COLUMN_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -947,10 +933,10 @@ public class TrinoDatabaseMetaData
         schemaPattern = escapeIfNecessary(schemaPattern);
         tableNamePattern = escapeIfNecessary(tableNamePattern);
         StringBuilder query = new StringBuilder("" +
-                "SELECT TABLE_CAT, TABLE_SCHEM, TABLE_NAME, TABLE_TYPE, REMARKS,\n" +
-                "  TYPE_CAT, TYPE_SCHEM, TYPE_NAME, " +
-                "  SELF_REFERENCING_COL_NAME, REF_GENERATION\n" +
-                "FROM system.jdbc.tables");
+                "SELECT table_catalog as TABLE_CAT,table_schema as TABLE_SCHEM,table_name as TABLE_NAME, table_type as TABLE_TYPE,\n" +
+                "'1' as REMARKS, " +
+                "  '1' as  TYPE_CAT, '1' as TYPE_SCHEM, '1' as TYPE_NAME, '1' as SELF_REFERENCING_COL_NAME, '1' as REF_GENERATION\n" +
+                "FROM hive.INFORMATION_SCHEMA.tables");
 
         List<String> filters = new ArrayList<>();
         emptyStringEqualsFilter(filters, "TABLE_CAT", catalog);
@@ -961,37 +947,28 @@ public class TrinoDatabaseMetaData
 
         query.append("\nORDER BY TABLE_TYPE, TABLE_CAT, TABLE_SCHEM, TABLE_NAME");
 
-        return select(query.toString());
+        throw new SQLException("No results");
     }
 
     @Override
     public ResultSet getSchemas()
             throws SQLException
     {
-        return select("" +
-                "SELECT TABLE_SCHEM, TABLE_CATALOG\n" +
-                "FROM system.jdbc.schemas\n" +
-                "ORDER BY TABLE_CATALOG, TABLE_SCHEM");
+        throw new SQLException("No results");
     }
 
     @Override
     public ResultSet getCatalogs()
             throws SQLException
     {
-        return select("" +
-                "SELECT TABLE_CAT\n" +
-                "FROM system.jdbc.catalogs\n" +
-                "ORDER BY TABLE_CAT");
+        throw new SQLException("No results");
     }
 
     @Override
     public ResultSet getTableTypes()
             throws SQLException
     {
-        return select("" +
-                "SELECT TABLE_TYPE\n" +
-                "FROM system.jdbc.table_types\n" +
-                "ORDER BY TABLE_TYPE");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1019,7 +996,7 @@ public class TrinoDatabaseMetaData
 
         query.append("\nORDER BY TABLE_CAT, TABLE_SCHEM, TABLE_NAME, ORDINAL_POSITION");
 
-        return select(query.toString());
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1065,7 +1042,7 @@ public class TrinoDatabaseMetaData
                 " CAST(NULL AS smallint) KEY_SEQ, " +
                 " CAST(NULL AS varchar) PK_NAME " +
                 "WHERE false";
-        return select(query);
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1088,7 +1065,7 @@ public class TrinoDatabaseMetaData
                 " CAST(NULL AS varchar) PK_NAME, " +
                 " CAST(NULL AS smallint) DEFERRABILITY " +
                 "WHERE false";
-        return select(query);
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1109,13 +1086,7 @@ public class TrinoDatabaseMetaData
     public ResultSet getTypeInfo()
             throws SQLException
     {
-        return select("" +
-                "SELECT TYPE_NAME, DATA_TYPE, PRECISION, LITERAL_PREFIX, LITERAL_SUFFIX,\n" +
-                "CREATE_PARAMS, NULLABLE, CASE_SENSITIVE, SEARCHABLE, UNSIGNED_ATTRIBUTE,\n" +
-                "FIXED_PREC_SCALE, AUTO_INCREMENT, LOCAL_TYPE_NAME, MINIMUM_SCALE, MAXIMUM_SCALE,\n" +
-                "SQL_DATA_TYPE, SQL_DATETIME_SUB, NUM_PREC_RADIX\n" +
-                "FROM system.jdbc.types\n" +
-                "ORDER BY DATA_TYPE");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1216,11 +1187,7 @@ public class TrinoDatabaseMetaData
     {
         schemaPattern = escapeIfNecessary(schemaPattern);
         typeNamePattern = escapeIfNecessary(typeNamePattern);
-        return selectEmpty("" +
-                "SELECT TYPE_CAT, TYPE_SCHEM, TYPE_NAME,\n" +
-                "  CLASS_NAME, DATA_TYPE, REMARKS, BASE_TYPE\n" +
-                "FROM system.jdbc.udts\n" +
-                "ORDER BY DATA_TYPE, TYPE_CAT, TYPE_SCHEM, TYPE_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1264,11 +1231,7 @@ public class TrinoDatabaseMetaData
     {
         schemaPattern = escapeIfNecessary(schemaPattern);
         typeNamePattern = escapeIfNecessary(typeNamePattern);
-        return selectEmpty("" +
-                "SELECT TYPE_CAT, TYPE_SCHEM, TYPE_NAME,\n" +
-                "  SUPERTYPE_CAT, SUPERTYPE_SCHEM, SUPERTYPE_NAME\n" +
-                "FROM system.jdbc.super_types\n" +
-                "ORDER BY TYPE_CAT, TYPE_SCHEM, TYPE_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1277,27 +1240,14 @@ public class TrinoDatabaseMetaData
     {
         schemaPattern = escapeIfNecessary(schemaPattern);
         tableNamePattern = escapeIfNecessary(tableNamePattern);
-        return selectEmpty("" +
-                "SELECT TABLE_CAT, TABLE_SCHEM, TABLE_NAME, SUPERTABLE_NAME\n" +
-                "FROM system.jdbc.super_tables\n" +
-                "ORDER BY TABLE_CAT, TABLE_SCHEM, TABLE_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
     public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern)
             throws SQLException
     {
-        schemaPattern = escapeIfNecessary(schemaPattern);
-        typeNamePattern = escapeIfNecessary(typeNamePattern);
-        attributeNamePattern = escapeIfNecessary(attributeNamePattern);
-        return selectEmpty("" +
-                "SELECT TYPE_CAT, TYPE_SCHEM, TYPE_NAME, ATTR_NAME, DATA_TYPE,\n" +
-                "  ATTR_TYPE_NAME, ATTR_SIZE, DECIMAL_DIGITS, NUM_PREC_RADIX, NULLABLE,\n" +
-                "  REMARKS, ATTR_DEF, SQL_DATA_TYPE, SQL_DATETIME_SUB, CHAR_OCTET_LENGTH,\n" +
-                "  ORDINAL_POSITION, IS_NULLABLE, SCOPE_CATALOG, SCOPE_SCHEMA, SCOPE_TABLE,\n" +
-                "SOURCE_DATA_TYPE\n" +
-                "FROM system.jdbc.attributes\n" +
-                "ORDER BY TYPE_CAT, TYPE_SCHEM, TYPE_NAME, ORDINAL_POSITION");
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1399,7 +1349,7 @@ public class TrinoDatabaseMetaData
 
         query.append("\nORDER BY TABLE_CATALOG, TABLE_SCHEM");
 
-        return select(query.toString());
+        throw new SQLException("No results");
     }
 
     @Override
@@ -1471,12 +1421,7 @@ public class TrinoDatabaseMetaData
         schemaPattern = escapeIfNecessary(schemaPattern);
         tableNamePattern = escapeIfNecessary(tableNamePattern);
         columnNamePattern = escapeIfNecessary(columnNamePattern);
-        return selectEmpty("" +
-                "SELECT TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME, DATA_TYPE,\n" +
-                "  COLUMN_SIZE, DECIMAL_DIGITS, NUM_PREC_RADIX, COLUMN_USAGE, REMARKS,\n" +
-                "  CHAR_OCTET_LENGTH, IS_NULLABLE\n" +
-                "FROM system.jdbc.pseudo_columns\n" +
-                "ORDER BY TABLE_CAT, table_SCHEM, TABLE_NAME, COLUMN_NAME");
+        throw new SQLException("No results");
     }
 
     @Override
