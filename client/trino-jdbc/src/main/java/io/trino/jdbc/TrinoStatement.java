@@ -57,6 +57,7 @@ public class TrinoStatement
     TrinoStatement(TrinoConnection connection, Consumer<TrinoStatement> onClose)
     {
         this.connection = new AtomicReference<>(requireNonNull(connection, "connection is null"));
+        connection.getMaxRow().ifPresent(maxRows::set);
         this.onClose = requireNonNull(onClose, "onClose is null");
     }
 
@@ -153,6 +154,7 @@ public class TrinoStatement
             throw new SQLException("Max rows must be positive");
         }
         maxRows.set(max);
+        connection.get().getMaxRow().ifPresent(maxRows::set);
     }
 
     @Override
@@ -248,8 +250,11 @@ public class TrinoStatement
 
         StatementClient client = null;
         TrinoResultSet resultSet = null;
+        QueryRefactor queryRefactor = null;
         try {
-            client = connection().startQuery(sql, getStatementSessionProperties());
+            queryRefactor = new QueryRefactor(maxRows.get());
+            String refactorSql = queryRefactor.refactorQuery(sql);
+            client = connection().startQuery(refactorSql, getStatementSessionProperties());
             if (client.isFinished()) {
                 QueryStatusInfo finalStatusInfo = client.finalStatusInfo();
                 if (finalStatusInfo.getError() != null) {

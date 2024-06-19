@@ -97,6 +97,7 @@ final class ConnectionProperties
     public static final ConnectionProperty<String, Class<? extends DnsResolver>> DNS_RESOLVER = new Resolver();
     public static final ConnectionProperty<String, String> DNS_RESOLVER_CONTEXT = new ResolverContext();
     public static final ConnectionProperty<String, String> HOSTNAME_IN_CERTIFICATE = new HostnameInCertificate();
+    public static final ConnectionProperty<String, Long> MAX_ROW = new MaxRow();
 
     private static final Set<ConnectionProperty<?, ?>> ALL_PROPERTIES = ImmutableSet.<ConnectionProperty<?, ?>>builder()
             .add(USER)
@@ -141,6 +142,7 @@ final class ConnectionProperties
             .add(DNS_RESOLVER)
             .add(DNS_RESOLVER_CONTEXT)
             .add(HOSTNAME_IN_CERTIFICATE)
+            .add(MAX_ROW)
             .build();
 
     private static final Map<String, ConnectionProperty<?, ?>> KEY_LOOKUP = unmodifiableMap(ALL_PROPERTIES.stream()
@@ -182,6 +184,15 @@ final class ConnectionProperties
         protected SessionUser()
         {
             super(PropertyName.SESSION_USER, NOT_REQUIRED, ALLOWED, NON_EMPTY_STRING_CONVERTER);
+        }
+    }
+
+    private static class MaxRow
+            extends AbstractConnectionProperty<String, Long>
+    {
+        protected MaxRow()
+        {
+            super(PropertyName.MAX_ROW, NOT_REQUIRED, ALLOWED, LONG_CONVERTER);
         }
     }
 

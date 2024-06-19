@@ -167,6 +167,8 @@ abstract class AbstractConnectionProperty<V, T>
 
     protected static final Converter<String, String> STRING_CONVERTER = String.class::cast;
 
+    protected static final Converter<String, Long> LONG_CONVERTER = Long::parseLong;
+
     protected static final Converter<String, String> NON_EMPTY_STRING_CONVERTER = value -> {
         checkArgument(!value.isEmpty(), "value is empty");
         return value;

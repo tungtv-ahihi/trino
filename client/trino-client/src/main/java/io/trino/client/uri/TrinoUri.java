@@ -85,6 +85,7 @@ import static io.trino.client.uri.ConnectionProperties.KERBEROS_PRINCIPAL;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_REMOTE_SERVICE_NAME;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_SERVICE_PRINCIPAL_PATTERN;
 import static io.trino.client.uri.ConnectionProperties.KERBEROS_USE_CANONICAL_HOSTNAME;
+import static io.trino.client.uri.ConnectionProperties.MAX_ROW;
 import static io.trino.client.uri.ConnectionProperties.PASSWORD;
 import static io.trino.client.uri.ConnectionProperties.ROLES;
 import static io.trino.client.uri.ConnectionProperties.SESSION_PROPERTIES;
@@ -164,6 +165,7 @@ public class TrinoUri
     private Optional<String> traceToken;
     private Optional<Map<String, String>> sessionProperties;
     private Optional<String> source;
+    private Optional<Long> maxRow;
 
     private Optional<String> catalog = Optional.empty();
     private Optional<String> schema = Optional.empty();
@@ -215,7 +217,8 @@ public class TrinoUri
             Optional<String> clientTags,
             Optional<String> traceToken,
             Optional<Map<String, String>> sessionProperties,
-            Optional<String> source)
+            Optional<String> source,
+            Optional<Long> maxRow)
             throws SQLException
     {
         this.uri = requireNonNull(uri, "uri is null");
@@ -267,6 +270,7 @@ public class TrinoUri
         this.traceToken = TRACE_TOKEN.getValueOrDefault(urlProperties, traceToken);
         this.sessionProperties = SESSION_PROPERTIES.getValueOrDefault(urlProperties, sessionProperties);
         this.source = SOURCE.getValueOrDefault(urlProperties, source);
+        this.maxRow = MAX_ROW.getValueOrDefault(urlProperties, maxRow);
 
         properties = buildProperties();
 
@@ -351,6 +355,7 @@ public class TrinoUri
         clientTags.ifPresent(value -> properties.setProperty(PropertyName.CLIENT_TAGS.toString(), value));
         traceToken.ifPresent(value -> properties.setProperty(PropertyName.TRACE_TOKEN.toString(), value));
         source.ifPresent(value -> properties.setProperty(PropertyName.SOURCE.toString(), value));
+        maxRow.ifPresent(value -> properties.setProperty(PropertyName.MAX_ROW.toString(), value.toString()));
         return properties;
     }
 
@@ -409,6 +414,7 @@ public class TrinoUri
         this.traceToken = TRACE_TOKEN.getValue(properties);
         this.sessionProperties = SESSION_PROPERTIES.getValue(properties);
         this.source = SOURCE.getValue(properties);
+        this.maxRow = MAX_ROW.getValue(properties);
 
         // enable SSL by default for the trino schema and the standard port
         useSecureConnection = ssl.orElse(uri.getScheme().equals("https") || (uri.getScheme().equals("trino") && uri.getPort() == 443));
@@ -464,6 +470,11 @@ public class TrinoUri
     public Optional<String> getUser()
     {
         return user;
+    }
+
+    public Optional<Long> getMaxRow()
+    {
+        return maxRow;
     }
 
     public boolean hasPassword()
@@ -914,6 +925,7 @@ public class TrinoUri
         private String traceToken;
         private Map<String, String> sessionProperties;
         private String source;
+        private Long maxRow;
 
         private Builder() {}
 
@@ -1243,7 +1255,8 @@ public class TrinoUri
                     Optional.ofNullable(clientTags),
                     Optional.ofNullable(traceToken),
                     Optional.ofNullable(sessionProperties),
-                    Optional.ofNullable(source));
+                    Optional.ofNullable(source),
+                    Optional.ofNullable(maxRow));
         }
     }
 }
